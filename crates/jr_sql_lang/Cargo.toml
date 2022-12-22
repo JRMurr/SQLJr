@@ -1,0 +1,11 @@
+[package]
+name = "jr_sql_parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nom = "7.1.1"
+
+thiserror = {workspace = true}
+serde = {workspace = true}
+nom_locate = "4.0.0"
