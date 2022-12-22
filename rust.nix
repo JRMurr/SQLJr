@@ -7,7 +7,7 @@ let
     cargo = rustVersion;
     rustc = rustVersion;
   };
-  name = "sqlThicc";
+  name = "jr-sql";
   version = "0.1.0";
   rustBin = rustPlatform.buildRustPackage {
     pname = name;

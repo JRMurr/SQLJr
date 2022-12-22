@@ -1,8 +1,12 @@
-[package]
-name = "sqlThicc"
-version = "0.1.0"
-edition = "2021"
+
+
+
+
+[workspace]
+members = [
+	"crates/*",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+# https://doc.rust-lang.org/nightly/cargo/reference/specifying-dependencies.html#inheriting-a-dependency-from-a-workspace
+[workspace.dependencies]
