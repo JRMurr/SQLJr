@@ -32,7 +32,7 @@
           };
         };
         packages = {
-          default = pkgs.hello;
+          default = rustAttrs.binary;
           rust-bin = rustAttrs.binary;
           rust-docker = rustAttrs.docker;
         };

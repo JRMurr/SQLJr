@@ -7,7 +7,7 @@ let
     cargo = rustVersion;
     rustc = rustVersion;
   };
-  name = "TODO:FILL ME";
+  name = "sqlThicc";
   version = "0.1.0";
   rustBin = rustPlatform.buildRustPackage {
     pname = name;
@@ -22,6 +22,6 @@ in {
   binary = rustBin;
   docker = pkgs.dockerTools.buildImage {
     name = name;
-    config = { Cmd = [ "${rustBin}/bin/TODO" ]; };
+    config = { Cmd = [ "${rustBin}/bin/${name}" ]; };
   };
 }
