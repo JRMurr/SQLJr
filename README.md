@@ -1,2 +1,2 @@
-# sqlThicc
-Toy DB to get more sytems expereince
+# jrSql
+Toy DB to get more systems experience
