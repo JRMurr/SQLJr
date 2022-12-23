@@ -1,4 +1,4 @@
-# jrSql
+# sqlJr
 Toy DB to get more systems experience
 
 

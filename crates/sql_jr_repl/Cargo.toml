@@ -1,5 +1,5 @@
 [package]
-name = "jr_sql_repl"
+name = "sql_jr_repl"
 version = "0.1.0"
 edition = "2021"
 
