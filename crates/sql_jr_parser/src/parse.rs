@@ -1,9 +1,12 @@
-use crate::ast::{InsertStatement, SelectStatement, SqlQuery};
+use crate::{
+    ast::SqlQuery,
+    commands::{insert_statement, select_statement},
+};
 use nom::{
     self,
     branch::alt,
-    bytes::complete::{tag_no_case, take_while1},
-    character::complete::{char, multispace0, multispace1},
+    bytes::complete::take_while1,
+    character::complete::{char, multispace0},
     combinator::map,
     error::{context, VerboseError},
     multi::separated_list1,
@@ -13,7 +16,7 @@ use nom::{
 use nom_locate::LocatedSpan;
 use serde::{Deserialize, Serialize};
 // use serde::{Deserialize, Serialize};
-type RawSpan<'a> = LocatedSpan<&'a str>;
+pub type RawSpan<'a> = LocatedSpan<&'a str>;
 
 pub type ParseError = String; // TODO: real error
 
@@ -56,7 +59,7 @@ pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>
 // type ParseResult<'a, T> = IResult<&'a str, T>;
 
 /// Parse a unquoted sql identifer
-fn identifier(i: RawSpan) -> ParseResult<String> {
+pub(crate) fn identifier(i: RawSpan) -> ParseResult<String> {
     context(
         "Identifier",
         map(take_while1(|c: char| c.is_alphanumeric()), |s: RawSpan| {
@@ -65,44 +68,14 @@ fn identifier(i: RawSpan) -> ParseResult<String> {
     )(i)
 }
 
-pub fn comma_sep<'a, O, E, F>(f: F) -> impl FnMut(RawSpan<'a>) -> IResult<RawSpan<'a>, Vec<O>, E>
+pub(crate) fn comma_sep<'a, O, E, F>(
+    f: F,
+) -> impl FnMut(RawSpan<'a>) -> IResult<RawSpan<'a>, Vec<O>, E>
 where
     F: nom::Parser<RawSpan<'a>, O, E>,
     E: nom::error::ParseError<RawSpan<'a>>,
 {
     separated_list1(tuple((multispace0, char(','), multispace0)), f)
-}
-
-fn select_statement(i: RawSpan) -> ParseResult<SelectStatement> {
-    let (remaining_input, (_, _, fields, _, _, _, tables)) = context(
-        "Select Statement",
-        tuple((
-            tag_no_case("select"),
-            multispace1,
-            context("fields", comma_sep(identifier)),
-            multispace1,
-            tag_no_case("from"),
-            multispace1,
-            context("tables", comma_sep(identifier)),
-        )),
-    )(i)?;
-
-    Ok((remaining_input, SelectStatement { fields, tables }))
-}
-
-fn insert_statement(i: RawSpan) -> ParseResult<InsertStatement> {
-    let (remaining_input, (_, _, table, _, values)) = context(
-        "Insert Statement",
-        tuple((
-            tag_no_case("insert"),
-            preceded(multispace1, tag_no_case("into")),
-            preceded(multispace1, context("table", identifier)),
-            preceded(multispace1, tag_no_case("values")),
-            preceded(multispace1, comma_sep(identifier)),
-        )),
-    )(i)?;
-
-    Ok((remaining_input, InsertStatement { table, values }))
 }
 
 pub fn sql_query(i: &str) -> ParseResult<SqlQuery> {
@@ -140,6 +113,8 @@ impl<'a> TryFrom<&'a str> for SqlQuery {
 
 #[cfg(test)]
 mod tests {
+    use crate::commands::*;
+
     use super::*;
 
     #[test]
