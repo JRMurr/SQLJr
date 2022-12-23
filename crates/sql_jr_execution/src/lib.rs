@@ -1,42 +1,48 @@
+mod table;
+
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use sql_jr_parser::ast::SqlQuery;
 
-type Row = HashMap<usize, String>; // easy
+use table::Table;
 
 #[derive(Debug, Default)]
 pub struct Execution {
-    data: Vec<Row>, // list
+    data: HashMap<String, Table>,
 }
 
 impl Execution {
     pub fn new() -> Self {
-        Self { data: Vec::new() }
+        Self {
+            data: HashMap::new(),
+        }
     }
 
     pub fn run(&mut self, query: SqlQuery) {
         match query {
             SqlQuery::Select(select) => {
-                let cols: Vec<usize> = select
-                    .fields
-                    .into_iter()
-                    .map(|f| f.parse().unwrap())
-                    .collect();
+                let cols = select.fields;
+
+                let table = self.data.get(select.tables.get(0).unwrap()).unwrap();
+
                 println!("{:?}", self.data);
-                for row in self.data.iter() {
+                for (id, row) in table.rows.iter() {
                     let vals: Vec<&String> = cols.iter().map(|f| row.get(f).unwrap()).collect();
 
                     println!("{vals:?}")
                 }
             }
             SqlQuery::Insert(insert) => {
-                let values = insert.values;
-                if values.len() != 2 {
-                    panic!("whats a schema. expect only 2 cols 0 and 1");
-                }
+                // let values = insert.values;
+                // if values.len() != 2 {
+                //     panic!("whats a schema. expect only 2 cols 0 and 1");
+                // }
 
-                let row: Row = values.into_iter().enumerate().collect();
-                self.data.push(row);
+                // let row: Row = values.into_iter().enumerate().collect();
+                // self.data.push(row);
+
+                todo!()
             }
         }
     }

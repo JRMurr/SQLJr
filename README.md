@@ -4,11 +4,15 @@ Toy DB to get more systems experience
 
 ## TODO
 
+- General
+  - Add create table command
+  - Make a schema aware row struct
 - Repl
   - Handle multiline queries (maybe streaming nom might work?)
 - Parser
   - Would be cool to make a combinator/macro that is tuple where each elem is separated by whitespace
   - Make a trait that each command can implement to be parsed from a span (like gdlk...)
+  - Display errors nicely (look into what swc/rustc does to make it look good)
 
 ## Resources
 - [Nom sql parser](https://github.com/ms705/nom-sql)
