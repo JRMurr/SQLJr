@@ -15,6 +15,8 @@ use serde::{Deserialize, Serialize};
 // use serde::{Deserialize, Serialize};
 type RawSpan<'a> = LocatedSpan<&'a str>;
 
+pub type ParseError = String; // TODO: real error
+
 // stealing more code from gdlk...
 // https://github.com/LucasPickering/gdlk/blob/1fb8c9b988fd86be8541a66b8e079a1b9d133cf4/crates/core/src/util.rs#L18
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -49,7 +51,7 @@ impl<'a> From<RawSpan<'a>> for Span {
     }
 }
 
-type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>;
+pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>;
 
 // type ParseResult<'a, T> = IResult<&'a str, T>;
 
@@ -83,12 +85,21 @@ fn select_statment(i: RawSpan) -> ParseResult<SelectStatement> {
 
 pub fn sql_query(i: &str) -> ParseResult<SqlQuery> {
     let i = LocatedSpan::new(i);
-    alt((map(select_statment, SqlQuery::Select),))(i)
+    let (rest, (query, _, _)) = context(
+        "query",
+        tuple((
+            alt((map(select_statment, SqlQuery::Select),)),
+            multispace0,
+            char(';'),
+        )),
+    )(i)?;
+
+    Ok((rest, query))
 }
 
 impl<'a> TryFrom<&'a str> for SqlQuery {
     // type Error = VerboseError<RawSpan<'a>>;
-    type Error = String;
+    type Error = ParseError;
 
     fn try_from(value: &'a str) -> Result<Self, Self::Error> {
         match sql_query(value) {
@@ -104,8 +115,8 @@ mod tests {
 
     #[test]
     fn test_error() {
-        let query = std::convert::TryInto::<SqlQuery>::try_into("select fart");
-        dbg!(query);
+        let query = std::convert::TryInto::<SqlQuery>::try_into("select fart;");
+        assert!(query.is_err(), "expected parse to fail, got {query:?}");
     }
 
     #[test]
@@ -115,7 +126,7 @@ mod tests {
             fields: vec!["foo".to_string(), "bar".to_string()],
         };
         assert_eq!(
-            sql_query("select foo, bar from t1,t2").unwrap().1,
+            sql_query("select foo, bar from t1,t2;").unwrap().1,
             SqlQuery::Select(expected)
         )
     }

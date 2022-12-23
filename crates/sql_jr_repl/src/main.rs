@@ -1,12 +1,17 @@
 use rustyline::{self, error::ReadlineError};
-
+use sql_jr_parser::{self, ast::SqlQuery, parse::ParseError};
 fn main() -> eyre::Result<()> {
     let mut rl = rustyline::Editor::<()>::new()?;
 
     loop {
         let readline = rl.readline(">> ");
         match readline {
-            Ok(line) => println!("Line: {line:?}"),
+            Ok(line) => {
+                let line: &str = line.as_ref();
+                let query: Result<SqlQuery, ParseError> = line.try_into();
+
+                println!("query: {query:?}")
+            }
             Err(ReadlineError::Interrupted) => {
                 // CTRL-C so just skip
             }

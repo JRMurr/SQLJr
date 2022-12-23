@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 eyre = "0.6.8"
 rustyline = "10.0.0"
+sql_jr_parser = { path = "../sql_jr_parser" }
