@@ -17,8 +17,9 @@ fn main() -> eyre::Result<()> {
                 rl.add_history_entry(line.as_str());
                 let line: &str = line.as_ref();
                 let query: Result<SqlQuery, ParseError> = line.try_into();
-                if let Ok(q) = query {
-                    exec.run(q);
+                match query {
+                    Ok(q) => exec.run(q),
+                    Err(e) => eprintln!("{e}"),
                 }
             }
             Err(ReadlineError::Interrupted) => {

@@ -24,7 +24,7 @@ pub(crate) fn insert_statement(i: RawSpan) -> ParseResult<InsertStatement> {
             preceded(multispace1, tag_no_case("into")),
             preceded(multispace1, context("table", identifier)),
             preceded(multispace1, tag_no_case("values")),
-            preceded(multispace1, comma_sep(identifier)),
+            preceded(multispace1, context("values", comma_sep(identifier))),
         )),
     )(i)?;
 
