@@ -1,14 +1,23 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::collections::HashMap;
+
+use sql_jr_parser::ast::SqlQuery;
+
+type Row = HashMap<String, String>; // easy
+
+#[derive(Debug, Default)]
+pub struct Execution {
+    data: Vec<Row>, // list
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Execution {
+    pub fn new() -> Self {
+        Self { data: Vec::new() }
+    }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    pub fn run(&mut self, query: SqlQuery) {
+        match query {
+            SqlQuery::Select(select) => println!("select: {select}"),
+            SqlQuery::Insert(insert) => println!("insert: {insert:?}"),
+        }
     }
 }

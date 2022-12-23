@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 thiserror = {workspace = true}
 serde = {workspace = true}
+sql_jr_parser = { path = "../sql_jr_parser" }

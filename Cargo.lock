@@ -345,6 +345,7 @@ name = "sql_jr_execution"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "sql_jr_parser",
  "thiserror",
 ]
 
@@ -364,6 +365,7 @@ version = "0.1.0"
 dependencies = [
  "eyre",
  "rustyline",
+ "sql_jr_execution",
  "sql_jr_parser",
 ]
 
