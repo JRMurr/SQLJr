@@ -14,3 +14,4 @@ Toy DB to get more systems experience
 - [Nom sql parser](https://github.com/ms705/nom-sql)
 - [DB walk through](https://cstack.github.io/db_tutorial/)
 - [Nom combinators](https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md)
+- [Searlization/page stuff](https://www.reddit.com/r/rust/comments/ukz786/rust_way_of_dealing_with_memory_allocation/)

@@ -36,8 +36,6 @@ impl Execution {
                 }
 
                 let row: Row = values.into_iter().enumerate().collect();
-                println!("{:?}", row);
-
                 self.data.push(row);
             }
         }
