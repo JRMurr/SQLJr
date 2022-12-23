@@ -1,4 +1,4 @@
-use crate::ast::{SelectStatement, SqlQuery};
+use crate::ast::{InsertStatement, SelectStatement, SqlQuery};
 use nom::{
     self,
     branch::alt,
@@ -7,7 +7,7 @@ use nom::{
     combinator::map,
     error::{context, VerboseError},
     multi::separated_list1,
-    sequence::tuple,
+    sequence::{preceded, tuple},
     IResult, Slice,
 };
 use nom_locate::LocatedSpan;
@@ -65,33 +65,62 @@ fn identifier(i: RawSpan) -> ParseResult<String> {
     )(i)
 }
 
-fn comma_sep_idents(i: RawSpan) -> ParseResult<Vec<String>> {
-    separated_list1(tuple((multispace0, char(','), multispace0)), identifier)(i)
+pub fn comma_sep<'a, O, E, F>(f: F) -> impl FnMut(RawSpan<'a>) -> IResult<RawSpan<'a>, Vec<O>, E>
+where
+    F: nom::Parser<RawSpan<'a>, O, E>,
+    E: nom::error::ParseError<RawSpan<'a>>,
+{
+    separated_list1(tuple((multispace0, char(','), multispace0)), f)
 }
 
-fn select_statment(i: RawSpan) -> ParseResult<SelectStatement> {
-    let (remaining_input, (_, _, fields, _, _, _, tables)) = tuple((
-        tag_no_case("select"),
-        multispace1,
-        context("fields", comma_sep_idents),
-        multispace1,
-        tag_no_case("from"),
-        multispace1,
-        context("tables", comma_sep_idents),
-    ))(i)?;
+fn select_statement(i: RawSpan) -> ParseResult<SelectStatement> {
+    let (remaining_input, (_, _, fields, _, _, _, tables)) = context(
+        "Select Statement",
+        tuple((
+            tag_no_case("select"),
+            multispace1,
+            context("fields", comma_sep(identifier)),
+            multispace1,
+            tag_no_case("from"),
+            multispace1,
+            context("tables", comma_sep(identifier)),
+        )),
+    )(i)?;
 
     Ok((remaining_input, SelectStatement { fields, tables }))
 }
 
+fn insert_statement(i: RawSpan) -> ParseResult<InsertStatement> {
+    let (remaining_input, (_, _, table, _, values)) = context(
+        "Insert Statement",
+        tuple((
+            tag_no_case("insert"),
+            preceded(multispace1, tag_no_case("into")),
+            preceded(multispace1, context("table", identifier)),
+            preceded(multispace1, tag_no_case("values")),
+            preceded(multispace1, comma_sep(identifier)),
+        )),
+    )(i)?;
+
+    Ok((remaining_input, InsertStatement { table, values }))
+}
+
 pub fn sql_query(i: &str) -> ParseResult<SqlQuery> {
     let i = LocatedSpan::new(i);
-    let (rest, (query, _, _)) = context(
-        "query",
-        tuple((
-            alt((map(select_statment, SqlQuery::Select),)),
+    let (rest, (query, _, _, _)) = context(
+        "Query",
+        preceded(
             multispace0,
-            char(';'),
-        )),
+            tuple((
+                alt((
+                    map(select_statement, SqlQuery::Select),
+                    map(insert_statement, SqlQuery::Insert),
+                )),
+                multispace0,
+                char(';'),
+                multispace0,
+            )),
+        ),
     )(i)?;
 
     Ok((rest, query))
@@ -128,6 +157,18 @@ mod tests {
         assert_eq!(
             sql_query("select foo, bar from t1,t2;").unwrap().1,
             SqlQuery::Select(expected)
+        )
+    }
+
+    #[test]
+    fn test_insert() {
+        let expected = InsertStatement {
+            table: "foo".to_string(),
+            values: vec!["foo".to_string(), "bar".to_string()],
+        };
+        assert_eq!(
+            sql_query("insert into foo values foo,bar;").unwrap().1,
+            SqlQuery::Insert(expected)
         )
     }
 }

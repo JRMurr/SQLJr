@@ -22,12 +22,18 @@ impl fmt::Display for SelectStatement {
     }
 }
 
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq, Serialize, Deserialize)]
+pub struct InsertStatement {
+    pub table: String,
+    pub values: Vec<String>, // for now just Strings
+}
+
 /// All possible query types you can run
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub enum SqlQuery {
     Select(SelectStatement),
+    Insert(InsertStatement),
     // create table
-    // insert
     // update
     //...
 }
