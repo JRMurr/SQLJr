@@ -15,9 +15,7 @@ use crate::{commands::*, parse::Parse};
 pub enum SqlQuery {
     Select(SelectStatement),
     Insert(InsertStatement),
-    // create table
-    // update
-    //...
+    Create(CreateStatement),
 }
 
 impl<'a> Parse<'a> for SqlQuery {
@@ -30,6 +28,7 @@ impl<'a> Parse<'a> for SqlQuery {
                     alt((
                         map(SelectStatement::parse, SqlQuery::Select),
                         map(InsertStatement::parse, SqlQuery::Insert),
+                        map(CreateStatement::parse, SqlQuery::Create),
                     )),
                     multispace0,
                     char(';'),

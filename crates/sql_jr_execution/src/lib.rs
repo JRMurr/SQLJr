@@ -44,6 +44,9 @@ impl Execution {
 
                 todo!()
             }
+            SqlQuery::Create(create) => {
+                todo!()
+            }
         }
     }
 }

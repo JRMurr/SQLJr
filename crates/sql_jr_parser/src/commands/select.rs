@@ -45,3 +45,23 @@ impl<'a> Parse<'a> for SelectStatement {
         Ok((remaining_input, SelectStatement { fields, tables }))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_select() {
+        let expected = SelectStatement {
+            tables: vec!["t1".to_string(), "t2".to_string()],
+            fields: vec!["foo".to_string(), "bar".to_string()],
+        };
+
+        assert_eq!(
+            SelectStatement::parse_from_raw("select foo, bar from t1,t2;")
+                .unwrap()
+                .1,
+            expected
+        )
+    }
+}

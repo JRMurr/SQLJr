@@ -1,13 +1,12 @@
 use crate::ast::SqlQuery;
 use nom::{
     self,
-    branch::alt,
     bytes::complete::take_while1,
     character::complete::{char, multispace0},
     combinator::map,
     error::{context, VerboseError},
     multi::separated_list1,
-    sequence::{preceded, tuple},
+    sequence::tuple,
     IResult, Slice,
 };
 use nom_locate::LocatedSpan;
@@ -58,6 +57,12 @@ pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>
 pub(crate) trait Parse<'a>: Sized {
     /// Parse the given span into self
     fn parse(input: RawSpan<'a>) -> ParseResult<'a, Self>;
+
+    // Helper method to convert a raw str into a raw span and parse
+    fn parse_from_raw(input: &'a str) -> ParseResult<'a, Self> {
+        let i = LocatedSpan::new(input);
+        Self::parse(i)
+    }
 }
 
 /// Parse a unquoted sql identifer

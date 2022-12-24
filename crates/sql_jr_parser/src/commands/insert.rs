@@ -1,5 +1,3 @@
-use core::fmt;
-
 use nom::{
     bytes::complete::tag_no_case,
     character::complete::multispace1,
