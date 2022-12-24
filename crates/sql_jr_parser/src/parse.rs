@@ -1,7 +1,4 @@
-use crate::{
-    ast::SqlQuery,
-    commands::{insert_statement, select_statement},
-};
+use crate::ast::SqlQuery;
 use nom::{
     self,
     branch::alt,
@@ -56,7 +53,12 @@ impl<'a> From<RawSpan<'a>> for Span {
 
 pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>;
 
-// type ParseResult<'a, T> = IResult<&'a str, T>;
+/// Implement the parse function to more easily convert a span into a sql
+/// command
+pub(crate) trait Parse<'a>: Sized {
+    /// Parse the given span into self
+    fn parse(input: RawSpan<'a>) -> ParseResult<'a, Self>;
+}
 
 /// Parse a unquoted sql identifer
 pub(crate) fn identifier(i: RawSpan) -> ParseResult<String> {
@@ -80,23 +82,9 @@ where
 
 pub fn sql_query(i: &str) -> ParseResult<SqlQuery> {
     let i = LocatedSpan::new(i);
-    let (rest, (query, _, _, _)) = context(
-        "Query",
-        preceded(
-            multispace0,
-            tuple((
-                alt((
-                    map(select_statement, SqlQuery::Select),
-                    map(insert_statement, SqlQuery::Insert),
-                )),
-                multispace0,
-                char(';'),
-                multispace0,
-            )),
-        ),
-    )(i)?;
-
-    Ok((rest, query))
+    // TODO: need a good entry point to parsing with error handling
+    // try from below works but a little annoying to call
+    SqlQuery::parse(i)
 }
 
 impl<'a> TryFrom<&'a str> for SqlQuery {

@@ -27,7 +27,7 @@ impl Execution {
                 let table = self.data.get(select.tables.get(0).unwrap()).unwrap();
 
                 println!("{:?}", self.data);
-                for (id, row) in table.rows.iter() {
+                for (id, row) in table.iter() {
                     let vals: Vec<&String> = cols.iter().map(|f| row.get(f).unwrap()).collect();
 
                     println!("{vals:?}")
