@@ -35,8 +35,8 @@ impl<'a> Parse<'a> for SqlTypeInfo {
 // to?
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct Column {
-    name: String, // look into https://docs.rs/ustr/latest/ustr/
-    type_info: SqlTypeInfo,
+    pub name: String, // look into https://docs.rs/ustr/latest/ustr/
+    pub type_info: SqlTypeInfo,
 }
 
 impl<'a> Parse<'a> for Column {
