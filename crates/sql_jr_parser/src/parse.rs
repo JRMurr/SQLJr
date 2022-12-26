@@ -4,10 +4,10 @@ use nom::{
     bytes::complete::take_while1,
     character::complete::{char, multispace0},
     combinator::map,
-    error::{context, VerboseError},
+    error::{context, convert_error, VerboseError},
     multi::separated_list1,
     sequence::tuple,
-    IResult, Slice,
+    Finish, IResult, Slice,
 };
 use nom_locate::LocatedSpan;
 use serde::{Deserialize, Serialize};
@@ -63,6 +63,23 @@ pub(crate) trait Parse<'a>: Sized {
         let i = LocatedSpan::new(input);
         Self::parse(i)
     }
+
+    fn parse_format_error(i: &'a str) -> Result<Self, String> {
+        let input = LocatedSpan::new(i);
+        // https://github.com/fflorent/nom_locate/issues/36#issuecomment-1013469728
+        match Self::parse(input).finish() {
+            Ok((_, query)) => Ok(query),
+            Err(e) => {
+                let errors = e
+                    .errors
+                    .into_iter()
+                    .map(|(input, error)| (*input.fragment(), error))
+                    .collect();
+
+                Err(convert_error(i, VerboseError { errors }))
+            } // TODO: real error handling
+        }
+    }
 }
 
 /// Parse a unquoted sql identifer
@@ -83,60 +100,4 @@ where
     E: nom::error::ParseError<RawSpan<'a>>,
 {
     separated_list1(tuple((multispace0, char(','), multispace0)), f)
-}
-
-pub fn sql_query(i: &str) -> ParseResult<SqlQuery> {
-    let i = LocatedSpan::new(i);
-    // TODO: need a good entry point to parsing with error handling
-    // try from below works but a little annoying to call
-    SqlQuery::parse(i)
-}
-
-impl<'a> TryFrom<&'a str> for SqlQuery {
-    // type Error = VerboseError<RawSpan<'a>>;
-    type Error = ParseError;
-
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        match sql_query(value) {
-            Ok((_, query)) => Ok(query),
-            Err(e) => Err(format!("{e:?}")), // TODO: real error handling
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::commands::*;
-
-    use super::*;
-
-    #[test]
-    fn test_error() {
-        let query = std::convert::TryInto::<SqlQuery>::try_into("select fart;");
-        assert!(query.is_err(), "expected parse to fail, got {query:?}");
-    }
-
-    #[test]
-    fn test_select() {
-        let expected = SelectStatement {
-            tables: vec!["t1".to_string(), "t2".to_string()],
-            fields: vec!["foo".to_string(), "bar".to_string()],
-        };
-        assert_eq!(
-            sql_query("select foo, bar from t1,t2;").unwrap().1,
-            SqlQuery::Select(expected)
-        )
-    }
-
-    #[test]
-    fn test_insert() {
-        let expected = InsertStatement {
-            table: "foo".to_string(),
-            values: vec!["foo".to_string(), "bar".to_string()],
-        };
-        assert_eq!(
-            sql_query("insert into foo values foo,bar;").unwrap().1,
-            SqlQuery::Insert(expected)
-        )
-    }
 }
