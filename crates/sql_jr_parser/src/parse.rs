@@ -1,4 +1,3 @@
-use crate::ast::SqlQuery;
 use nom::{
     self,
     bytes::complete::take_while1,

@@ -1,6 +1,5 @@
 mod table;
 
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use sql_jr_parser::ast::SqlQuery;

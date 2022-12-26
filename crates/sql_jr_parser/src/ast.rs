@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use nom::{
     self,
     branch::alt,
@@ -62,7 +60,6 @@ impl<'a> TryFrom<&'a str> for SqlQuery {
 
 #[cfg(test)]
 mod tests {
-    use crate::commands::*;
 
     use super::*;
 

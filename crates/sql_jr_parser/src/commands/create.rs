@@ -4,7 +4,7 @@ use nom::{
     character::complete::{char, multispace1},
     combinator::map,
     error::context,
-    sequence::{pair, preceded, separated_pair, tuple},
+    sequence::{preceded, separated_pair, tuple},
 };
 use serde::{Deserialize, Serialize};
 
