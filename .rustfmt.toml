@@ -1,3 +1,6 @@
 max_width = 100
 imports_granularity = "Crate"
 wrap_comments = true
+unstable_features = true
+group_imports="StdExternalCrate"
+edition="2021"

@@ -1,6 +1,7 @@
+use std::collections::{BTreeMap, HashMap};
+
 use serde::{Deserialize, Serialize};
 use sql_jr_parser::Column;
-use std::collections::{BTreeMap, HashMap};
 
 type Row = HashMap<String, String>;
 

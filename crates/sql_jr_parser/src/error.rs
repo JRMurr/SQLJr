@@ -1,7 +1,8 @@
-use crate::parse::RawSpan;
 use miette::Diagnostic;
 use nom_supreme::error::{BaseErrorKind, ErrorTree, GenericErrorTree, StackContext};
 use thiserror::Error;
+
+use crate::parse::RawSpan;
 
 pub(crate) type MyParseError<'a> = ErrorTree<RawSpan<'a>>;
 

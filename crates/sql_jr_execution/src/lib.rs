@@ -1,9 +1,7 @@
 mod table;
-
 use std::collections::HashMap;
 
 use sql_jr_parser::ast::SqlQuery;
-
 use table::Table;
 
 #[derive(Debug, Default)]

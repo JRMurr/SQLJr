@@ -9,47 +9,10 @@ use nom::{
 };
 use nom_locate::LocatedSpan;
 use nom_supreme::tag::complete::tag_no_case;
-use serde::{Deserialize, Serialize};
 
 use crate::error::{format_parse_error, FormattedError, MyParseError};
-// use serde::{Deserialize, Serialize};
+
 pub type RawSpan<'a> = LocatedSpan<&'a str>;
-
-pub type FormattedParseError = String; // TODO: real error
-
-// stealing more code from gdlk...
-// https://github.com/LucasPickering/gdlk/blob/1fb8c9b988fd86be8541a66b8e079a1b9d133cf4/crates/core/src/util.rs#L18
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Span {
-    /// Distance into the source at which this span starts. Starts at `0`.
-    pub offset: usize,
-    /// Number of characters that this span includes.
-    pub length: usize,
-    /// The line number that this span starts on, starting at `1`.
-    pub start_line: usize,
-    /// The column that this span starts at, starting at `1`.
-    pub start_col: usize,
-    /// The line number that this span ends on, starting at `1`.
-    pub end_line: usize,
-    /// The column that this span ends at, starting at `1`.
-    pub end_col: usize,
-}
-
-impl<'a> From<RawSpan<'a>> for Span {
-    fn from(value: RawSpan<'a>) -> Self {
-        let len = value.fragment().len();
-        let end = value.slice(len..);
-
-        Self {
-            offset: value.location_offset(),
-            length: value.fragment().len(),
-            start_line: value.location_line() as usize,
-            start_col: value.get_column(),
-            end_line: end.location_line() as usize,
-            end_col: end.get_column(),
-        }
-    }
-}
 
 pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, MyParseError<'a>>;
 
