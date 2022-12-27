@@ -1,10 +1,13 @@
+use miette::{Context, IntoDiagnostic};
 use rustyline::{self, error::ReadlineError};
-use sql_jr_parser::{self, ast::SqlQuery, parse::ParseError};
+use sql_jr_parser::{self, ast::SqlQuery, parse::FormattedParseError};
 
 const HISTORY_FILE: &str = "./history.txt";
 
-fn main() -> eyre::Result<()> {
-    let mut rl = rustyline::Editor::<()>::new()?;
+fn main() -> miette::Result<()> {
+    let mut rl = rustyline::Editor::<()>::new()
+        .into_diagnostic()
+        .wrap_err("Initilizing REPL")?;
     if rl.load_history(HISTORY_FILE).is_err() {
         println!("No previous history.");
     }
@@ -16,7 +19,7 @@ fn main() -> eyre::Result<()> {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 let line: &str = line.as_ref();
-                let query: Result<SqlQuery, ParseError> = line.try_into();
+                let query: Result<SqlQuery, FormattedParseError> = line.try_into();
                 match query {
                     Ok(q) => exec.run(q),
                     Err(e) => eprintln!("{e}"),
@@ -35,7 +38,9 @@ fn main() -> eyre::Result<()> {
             }
         }
     }
-    rl.save_history(HISTORY_FILE)?;
+    rl.save_history(HISTORY_FILE)
+        .into_diagnostic()
+        .wrap_err("Saving REPL history")?;
 
     Ok(())
 }

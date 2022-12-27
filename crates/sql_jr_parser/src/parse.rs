@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 // use serde::{Deserialize, Serialize};
 pub type RawSpan<'a> = LocatedSpan<&'a str>;
 
-pub type ParseError = String; // TODO: real error
+pub type FormattedParseError = String; // TODO: real error
 
 // stealing more code from gdlk...
 // https://github.com/LucasPickering/gdlk/blob/1fb8c9b988fd86be8541a66b8e079a1b9d133cf4/crates/core/src/util.rs#L18

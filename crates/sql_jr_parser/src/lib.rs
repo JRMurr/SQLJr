@@ -1,6 +1,6 @@
 pub mod ast;
-pub mod parse;
-
 pub mod commands;
+mod error;
+pub mod parse;
 
 pub use commands::{Column, SqlTypeInfo};

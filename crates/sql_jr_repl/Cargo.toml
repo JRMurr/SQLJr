@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-eyre = "0.6.8"
+miette = {workspace = true, features = ["fancy"]}
 rustyline = "10.0.0"
-sql_jr_parser = { path = "../sql_jr_parser" }
 sql_jr_execution = { path = "../sql_jr_execution" }
+sql_jr_parser = { path = "../sql_jr_parser" }
