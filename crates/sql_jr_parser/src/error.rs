@@ -4,7 +4,7 @@ use thiserror::Error;
 
 use crate::parse::RawSpan;
 
-pub(crate) type MyParseError<'a> = ErrorTree<RawSpan<'a>>;
+pub type MyParseError<'a> = ErrorTree<RawSpan<'a>>;
 
 #[derive(Error, Debug, Diagnostic)]
 #[error("Parse Error")]

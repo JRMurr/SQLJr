@@ -18,7 +18,7 @@ pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, MyParseError<'a>>;
 
 /// Implement the parse function to more easily convert a span into a sql
 /// command
-pub(crate) trait Parse<'a>: Sized {
+pub trait Parse<'a>: Sized {
     /// Parse the given span into self
     fn parse(input: RawSpan<'a>) -> ParseResult<'a, Self>;
 
@@ -37,7 +37,7 @@ pub(crate) trait Parse<'a>: Sized {
     }
 }
 
-/// Parse a unquoted sql identifer
+/// Parse a unquoted sql identifier
 pub(crate) fn identifier(i: RawSpan) -> ParseResult<String> {
     map(take_while1(|c: char| c.is_alphanumeric()), |s: RawSpan| {
         s.fragment().to_string()
