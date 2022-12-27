@@ -1,9 +1,9 @@
 use nom::{
-    bytes::complete::tag_no_case,
     character::complete::multispace1,
     error::context,
     sequence::{preceded, tuple},
 };
+use nom_supreme::{tag::complete::tag_no_case, ParserExt};
 use serde::{Deserialize, Serialize};
 
 use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
@@ -21,9 +21,9 @@ impl<'a> Parse<'a> for InsertStatement {
             tuple((
                 tag_no_case("insert"),
                 preceded(multispace1, tag_no_case("into")),
-                preceded(multispace1, context("table", identifier)),
+                preceded(multispace1, identifier.context("Table Name")),
                 preceded(multispace1, tag_no_case("values")),
-                preceded(multispace1, context("values", comma_sep(identifier))),
+                preceded(multispace1, comma_sep(identifier).context("Values")),
             )),
         )(input)?;
 

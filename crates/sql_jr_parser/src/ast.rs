@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     commands::*,
+    error::FormattedError,
     parse::{FormattedParseError, Parse},
 };
 
@@ -48,7 +49,7 @@ impl<'a> Parse<'a> for SqlQuery {
 // https://github.com/Geal/nom/blob/main/doc/nom_recipes.md#implementing-fromstr
 impl<'a> TryFrom<&'a str> for SqlQuery {
     // type Error = VerboseError<RawSpan<'a>>;
-    type Error = FormattedParseError;
+    type Error = FormattedError<'a>;
 
     fn try_from(value: &'a str) -> Result<Self, Self::Error> {
         match SqlQuery::parse_format_error(value) {
@@ -56,6 +57,10 @@ impl<'a> TryFrom<&'a str> for SqlQuery {
             Err(e) => Err(e), // TODO: real error handling
         }
     }
+}
+
+pub fn parse_sql_query(input: &str) -> Result<SqlQuery, FormattedError<'_>> {
+    input.try_into()
 }
 
 #[cfg(test)]

@@ -1,11 +1,11 @@
 use nom::{
     branch::alt,
-    bytes::complete::tag_no_case,
     character::complete::{char, multispace1},
     combinator::map,
     error::context,
     sequence::{preceded, separated_pair, tuple},
 };
+use nom_supreme::{tag::complete::tag_no_case, ParserExt};
 use serde::{Deserialize, Serialize};
 
 use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
@@ -45,7 +45,7 @@ impl<'a> Parse<'a> for Column {
             "Create Column",
             map(
                 separated_pair(
-                    context("Column Name", identifier),
+                    identifier.context("Column Name"),
                     multispace1,
                     SqlTypeInfo::parse,
                 ),
@@ -82,7 +82,7 @@ impl<'a> Parse<'a> for CreateStatement {
                         tag_no_case("table"),
                         multispace1,
                     )),
-                    context("table", identifier),
+                    identifier.context("Table Name"),
                 ),
                 multispace1,
                 column_definitions,

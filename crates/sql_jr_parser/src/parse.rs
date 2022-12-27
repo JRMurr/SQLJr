@@ -2,7 +2,7 @@ use nom::{
     self,
     bytes::complete::take_while1,
     character::complete::{char, multispace0},
-    combinator::map,
+    combinator::{all_consuming, map},
     error::{context, convert_error, VerboseError},
     multi::separated_list1,
     sequence::tuple,
@@ -10,6 +10,8 @@ use nom::{
 };
 use nom_locate::LocatedSpan;
 use serde::{Deserialize, Serialize};
+
+use crate::error::{format_parse_error, FormattedError, MyParseError};
 // use serde::{Deserialize, Serialize};
 pub type RawSpan<'a> = LocatedSpan<&'a str>;
 
@@ -49,7 +51,7 @@ impl<'a> From<RawSpan<'a>> for Span {
     }
 }
 
-pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, VerboseError<RawSpan<'a>>>;
+pub type ParseResult<'a, T> = IResult<RawSpan<'a>, T, MyParseError<'a>>;
 
 /// Implement the parse function to more easily convert a span into a sql
 /// command
@@ -63,32 +65,21 @@ pub(crate) trait Parse<'a>: Sized {
         Self::parse(i)
     }
 
-    fn parse_format_error(i: &'a str) -> Result<Self, String> {
+    fn parse_format_error(i: &'a str) -> Result<Self, FormattedError<'a>> {
         let input = LocatedSpan::new(i);
         // https://github.com/fflorent/nom_locate/issues/36#issuecomment-1013469728
-        match Self::parse(input).finish() {
+        match all_consuming(Self::parse)(input).finish() {
             Ok((_, query)) => Ok(query),
-            Err(e) => {
-                let errors = e
-                    .errors
-                    .into_iter()
-                    .map(|(input, error)| (*input.fragment(), error))
-                    .collect();
-
-                Err(convert_error(i, VerboseError { errors }))
-            } // TODO: real error handling
+            Err(e) => Err(format_parse_error(i, e)),
         }
     }
 }
 
 /// Parse a unquoted sql identifer
 pub(crate) fn identifier(i: RawSpan) -> ParseResult<String> {
-    context(
-        "Identifier",
-        map(take_while1(|c: char| c.is_alphanumeric()), |s: RawSpan| {
-            s.fragment().to_string()
-        }),
-    )(i)
+    map(take_while1(|c: char| c.is_alphanumeric()), |s: RawSpan| {
+        s.fragment().to_string()
+    })(i)
 }
 
 pub(crate) fn comma_sep<'a, O, E, F>(

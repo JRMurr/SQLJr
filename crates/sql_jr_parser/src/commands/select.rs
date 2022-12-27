@@ -1,8 +1,7 @@
 use core::fmt;
 
-use nom::{
-    bytes::complete::tag_no_case, character::complete::multispace1, error::context, sequence::tuple,
-};
+use nom::{character::complete::multispace1, error::context, sequence::tuple};
+use nom_supreme::{tag::complete::tag_no_case, ParserExt};
 use serde::{Deserialize, Serialize};
 
 use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
@@ -34,11 +33,11 @@ impl<'a> Parse<'a> for SelectStatement {
             tuple((
                 tag_no_case("select"),
                 multispace1,
-                context("fields", comma_sep(identifier)),
+                comma_sep(identifier).context("Select Columns"),
                 multispace1,
                 tag_no_case("from"),
                 multispace1,
-                context("tables", comma_sep(identifier)),
+                comma_sep(identifier).context("From Table(s)"),
             )),
         )(input)?;
 
