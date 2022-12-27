@@ -5,7 +5,7 @@ use nom::{
     combinator::{all_consuming, map, peek},
     multi::separated_list1,
     sequence::{pair, tuple},
-    Finish, IResult, Slice,
+    Finish, IResult,
 };
 use nom_locate::LocatedSpan;
 use nom_supreme::tag::complete::tag_no_case;
@@ -30,7 +30,6 @@ pub(crate) trait Parse<'a>: Sized {
 
     fn parse_format_error(i: &'a str) -> Result<Self, FormattedError<'a>> {
         let input = LocatedSpan::new(i);
-        // https://github.com/fflorent/nom_locate/issues/36#issuecomment-1013469728
         match all_consuming(Self::parse)(input).finish() {
             Ok((_, query)) => Ok(query),
             Err(e) => Err(format_parse_error(i, e)),
