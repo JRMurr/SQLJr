@@ -2,13 +2,13 @@ use nom::{
     self,
     bytes::complete::take_while1,
     character::complete::{char, multispace0},
-    combinator::{all_consuming, map},
-    error::{context, convert_error, VerboseError},
+    combinator::{all_consuming, map, peek},
     multi::separated_list1,
-    sequence::tuple,
+    sequence::{pair, tuple},
     Finish, IResult, Slice,
 };
 use nom_locate::LocatedSpan;
+use nom_supreme::tag::complete::tag_no_case;
 use serde::{Deserialize, Serialize};
 
 use crate::error::{format_parse_error, FormattedError, MyParseError};
@@ -80,6 +80,24 @@ pub(crate) fn identifier(i: RawSpan) -> ParseResult<String> {
     map(take_while1(|c: char| c.is_alphanumeric()), |s: RawSpan| {
         s.fragment().to_string()
     })(i)
+}
+
+/// Check if the input has the passed in tag
+/// if so run the parser supplied (with the peeked tag still expected)
+/// and cut on error
+///
+/// This is useful for alts so we stop on errors
+pub(crate) fn peek_then_cut<'a, T, O, E, F>(
+    peek_tag: T,
+    f: F,
+) -> impl FnMut(RawSpan<'a>) -> IResult<RawSpan<'a>, O, E>
+where
+    T: nom::InputLength + Clone,
+    F: nom::Parser<RawSpan<'a>, O, E>,
+    E: nom::error::ParseError<RawSpan<'a>> + nom_supreme::tag::TagError<RawSpan<'a>, T>,
+    LocatedSpan<&'a str>: nom::Compare<T>,
+{
+    map(pair(peek(tag_no_case(peek_tag)), f), |(_, f_res)| f_res)
 }
 
 pub(crate) fn comma_sep<'a, O, E, F>(

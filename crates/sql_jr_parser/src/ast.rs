@@ -6,12 +6,13 @@ use nom::{
     error::context,
     sequence::{preceded, tuple},
 };
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
     commands::*,
     error::FormattedError,
-    parse::{FormattedParseError, Parse},
+    parse::{peek_then_cut, Parse},
 };
 
 /// All possible query types you can run
@@ -30,9 +31,9 @@ impl<'a> Parse<'a> for SqlQuery {
                 multispace0,
                 tuple((
                     alt((
-                        map(SelectStatement::parse, SqlQuery::Select),
-                        map(InsertStatement::parse, SqlQuery::Insert),
-                        map(CreateStatement::parse, SqlQuery::Create),
+                        peek_then_cut("select", map(SelectStatement::parse, SqlQuery::Select)),
+                        peek_then_cut("insert", map(InsertStatement::parse, SqlQuery::Insert)),
+                        peek_then_cut("create", map(CreateStatement::parse, SqlQuery::Create)),
                     )),
                     multispace0,
                     char(';'),

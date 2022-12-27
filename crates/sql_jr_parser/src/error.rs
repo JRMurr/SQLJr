@@ -1,6 +1,5 @@
 use crate::parse::RawSpan;
-use miette::{Diagnostic, SourceSpan};
-use nom::error::VerboseError;
+use miette::Diagnostic;
 use nom_supreme::error::{BaseErrorKind, ErrorTree, GenericErrorTree, StackContext};
 use thiserror::Error;
 
@@ -61,12 +60,14 @@ pub fn format_parse_error<'a>(input: &'a str, e: MyParseError<'a>) -> FormattedE
             base.others.append(&mut contexts);
             base
         }
-        GenericErrorTree::Alt(mut alt_errors) => {
-            dbg!(&alt_errors);
-            // TODO: find the longest alt and pick that
-            // if all the same try to join them together?
-            let e = alt_errors.swap_remove(0);
-            format_parse_error(input, e)
+        GenericErrorTree::Alt(alt_errors) => {
+            // get the error with the most context
+            // TODO: figure out what to do on ties
+            alt_errors
+                .into_iter()
+                .map(|e| format_parse_error(input, e))
+                .max_by_key(|formatted| formatted.others.len())
+                .unwrap()
         }
     }
 }

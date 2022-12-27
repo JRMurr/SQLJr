@@ -86,7 +86,8 @@ impl<'a> Parse<'a> for CreateStatement {
                 ),
                 multispace1,
                 column_definitions,
-            ),
+            )
+            .context("Create Table"),
             |(table, columns)| Self { table, columns },
         )(input)
     }
