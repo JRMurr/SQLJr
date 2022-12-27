@@ -10,7 +10,6 @@ Toy DB to get more systems experience
   - Handle multiline queries (maybe streaming nom might work?)
 - Parser
   - Would be cool to make a combinator/macro that is tuple where each elem is separated by whitespace
-  - Display errors nicely (look into what swc/rustc does to make it look good)
   - Would be cool to make a macro for SqlQuery that auto makes the alt with each variant
     - Errors
       - https://fasterthanli.me/series/advent-of-code-2022/part-11#nice-parser-errors
