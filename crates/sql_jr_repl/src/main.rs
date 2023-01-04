@@ -1,6 +1,5 @@
 use miette::{Context, GraphicalReportHandler, IntoDiagnostic};
-use rustyline::{self, error::ReadlineError};
-use sql_jr_parser::{self, ast::parse_sql_query};
+use rustyline::error::ReadlineError;
 
 const HISTORY_FILE: &str = "./history.txt";
 
@@ -19,12 +18,14 @@ fn main() -> miette::Result<()> {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 let line: &str = line.as_ref();
-                let query = parse_sql_query(line);
-                match query {
-                    Ok(q) => exec.run(q),
+                let res = exec.parse_and_run(line);
+                match res {
+                    Ok(_) => continue, // TODO: sql return value
                     Err(e) => {
                         let mut s = String::new();
                         GraphicalReportHandler::new()
+                            .with_cause_chain()
+                            .with_context_lines(10)
                             .render_report(&mut s, &e)
                             .unwrap();
                         println!("{s}");

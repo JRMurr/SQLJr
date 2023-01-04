@@ -1,7 +1,9 @@
+mod error;
 mod table;
 use std::collections::HashMap;
 
-use sql_jr_parser::ast::SqlQuery;
+use error::{QueryExecutionError, SQLError};
+use sql_jr_parser::ast::{parse_sql_query, SqlQuery};
 use table::Table;
 
 #[derive(Debug, Default)]
@@ -16,12 +18,16 @@ impl Execution {
         }
     }
 
-    pub fn run(&mut self, query: SqlQuery) {
+    pub fn run(&mut self, query: SqlQuery) -> Result<(), QueryExecutionError> {
         match query {
             SqlQuery::Select(select) => {
                 let cols = select.fields;
-
-                let table = self.tables.get(select.tables.get(0).unwrap()).unwrap();
+                // for now skipping joins
+                let table = select.tables.get(0).unwrap();
+                let table = self
+                    .tables
+                    .get(table)
+                    .ok_or(QueryExecutionError::TableNotFound(table.to_string()))?;
 
                 println!("{:?}", self.tables);
                 for (_id, row) in table.iter() {
@@ -33,7 +39,7 @@ impl Execution {
             SqlQuery::Insert(insert) => {
                 let Some(table) = self.tables.get_mut(&insert.table) else {
                     println!("no table");
-                    return;
+                    return Ok(());
                 };
 
                 table.insert(insert.values);
@@ -44,5 +50,13 @@ impl Execution {
                 self.tables.insert(create.table, table);
             }
         }
+        Ok(())
+    }
+
+    pub fn parse_and_run<'a>(&mut self, query: &'a str) -> Result<(), SQLError<'a>> {
+        let query = parse_sql_query(query)?;
+
+        let res = self.run(query)?;
+        Ok(res)
     }
 }
