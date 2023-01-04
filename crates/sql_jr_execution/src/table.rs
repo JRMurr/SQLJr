@@ -3,7 +3,8 @@ use std::collections::{BTreeMap, HashMap};
 use serde::{Deserialize, Serialize};
 use sql_jr_parser::Column;
 
-type Row = HashMap<String, String>;
+/// A Row stored in the db. Map of Column name to value
+pub type Row = HashMap<String, String>;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct Table {

@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+derive_more = "0.99.17"
 miette = {workspace = true}
 serde = {workspace = true}
 sql_jr_parser = { path = "../sql_jr_parser" }

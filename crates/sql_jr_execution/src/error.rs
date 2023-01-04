@@ -18,11 +18,9 @@ pub enum QueryExecutionError {
 #[derive(Error, Debug, Diagnostic)]
 #[error(transparent)]
 pub enum SQLError<'a> {
-    // #[diagnostic(code(SQLError::QueryExecutionError))]
     #[diagnostic(transparent)]
     QueryExecutionError(#[from] QueryExecutionError),
 
-    // #[diagnostic(code(SQLError::ParsingError))]
     #[diagnostic(transparent)]
     ParsingError(FormattedError<'a>),
 }

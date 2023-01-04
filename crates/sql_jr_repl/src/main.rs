@@ -20,7 +20,7 @@ fn main() -> miette::Result<()> {
                 let line: &str = line.as_ref();
                 let res = exec.parse_and_run(line);
                 match res {
-                    Ok(_) => continue, // TODO: sql return value
+                    Ok(exec_res) => println!("{exec_res}"),
                     Err(e) => {
                         let mut s = String::new();
                         GraphicalReportHandler::new()
