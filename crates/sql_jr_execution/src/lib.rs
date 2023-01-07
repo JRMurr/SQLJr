@@ -34,22 +34,14 @@ impl Execution {
 
     pub fn run(&mut self, query: SqlQuery) -> Result<ExecResponse, QueryExecutionError> {
         match query {
-            SqlQuery::Select(mut select) => {
+            SqlQuery::Select(select) => {
                 let _cols = select.fields;
-                // for now skipping joins
-                let table = select.tables.swap_remove(0);
+                let table = select.table;
                 let table = self
                     .tables
                     .get(&table)
                     .ok_or(QueryExecutionError::TableNotFound(table))?;
 
-                // let mut rows = Vec::with_capacity(table.len());
-                // for (_id, row) in table.iter() {
-                //     let vals: Vec<&String> = cols.iter().map(|f|
-                // row.get(f).unwrap()).collect();
-
-                //     println!("{vals:?}")
-                // }
                 let rows = table.iter().map(|(_id, row)| row.clone()).collect();
                 Ok(ExecResponse::Select(rows))
             }

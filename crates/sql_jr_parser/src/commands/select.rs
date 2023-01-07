@@ -8,7 +8,7 @@ use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
 
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct SelectStatement {
-    pub tables: Vec<String>,
+    pub table: String,
     pub fields: Vec<String>,
 }
 
@@ -20,7 +20,7 @@ impl fmt::Display for SelectStatement {
 
         write!(f, " FROM ")?;
 
-        write!(f, "{}", self.tables.join(", "))?;
+        write!(f, "{}", self.table)?;
 
         Ok(())
     }
@@ -28,7 +28,7 @@ impl fmt::Display for SelectStatement {
 
 impl<'a> Parse<'a> for SelectStatement {
     fn parse(input: RawSpan<'a>) -> ParseResult<'a, Self> {
-        let (remaining_input, (_, _, fields, _, _, _, tables)) = context(
+        let (remaining_input, (_, _, fields, _, _, _, table)) = context(
             "Select Statement",
             tuple((
                 tag_no_case("select"),
@@ -37,11 +37,11 @@ impl<'a> Parse<'a> for SelectStatement {
                 multispace1,
                 tag_no_case("from"),
                 multispace1,
-                comma_sep(identifier).context("From Table(s)"),
+                identifier.context("From Table"),
             )),
         )(input)?;
 
-        Ok((remaining_input, SelectStatement { fields, tables }))
+        Ok((remaining_input, SelectStatement { fields, table }))
     }
 }
 
@@ -52,12 +52,12 @@ mod tests {
     #[test]
     fn test_select() {
         let expected = SelectStatement {
-            tables: vec!["t1".to_string(), "t2".to_string()],
+            table: "t1".to_string(),
             fields: vec!["foo".to_string(), "bar".to_string()],
         };
 
         assert_eq!(
-            SelectStatement::parse_from_raw("select foo, bar from t1,t2;")
+            SelectStatement::parse_from_raw("select foo, bar from t1;")
                 .unwrap()
                 .1,
             expected

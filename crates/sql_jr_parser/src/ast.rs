@@ -77,11 +77,11 @@ mod tests {
     #[test]
     fn test_select() {
         let expected = SelectStatement {
-            tables: vec!["t1".to_string(), "t2".to_string()],
+            table: "t1".to_string(),
             fields: vec!["foo".to_string(), "bar".to_string()],
         };
         assert_eq!(
-            SqlQuery::parse_from_raw("select foo, bar from t1,t2;")
+            SqlQuery::parse_from_raw("select foo, bar from t1;")
                 .unwrap()
                 .1,
             SqlQuery::Select(expected)
