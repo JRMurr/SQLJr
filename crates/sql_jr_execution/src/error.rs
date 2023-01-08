@@ -10,6 +10,12 @@ use thiserror::Error;
 pub enum QueryExecutionError {
     #[error("Table {0} was not found")]
     TableNotFound(String),
+
+    #[error("Table {0} already exists")]
+    TableAlreadyExists(String),
+
+    #[error("Column {0} does not exist")]
+    ColumnDoesNotExist(String),
 }
 
 // @CLEANUP:  This feels weird to define here.

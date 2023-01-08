@@ -1,11 +1,13 @@
 mod error;
+mod row;
 mod table;
 use std::collections::HashMap;
 
 use derive_more::Display;
 use error::{QueryExecutionError, SQLError};
+use row::Row;
 use sql_jr_parser::ast::{parse_sql_query, SqlQuery};
-use table::{Row, Table};
+use table::Table;
 // TODO: Eventually might be good to have to do something like
 // `query('..').fetch` to get values back the rest of the query types would
 // return unit or some message
@@ -13,9 +15,9 @@ use table::{Row, Table};
 
 #[derive(Debug, Display)]
 
-pub enum ExecResponse {
+pub enum ExecResponse<'a> {
     #[display(fmt = "{_0:?}")] // only show the values not "Select(...)"
-    Select(Vec<Row>),
+    Select(Vec<Row<'a>>),
     Insert,
     Create,
 }
@@ -41,8 +43,8 @@ impl Execution {
                     .tables
                     .get(&table)
                     .ok_or(QueryExecutionError::TableNotFound(table))?;
-
-                let rows = table.iter().map(|(_id, row)| row.clone()).collect();
+                // TODO: check cols
+                let rows = table.iter().collect();
                 Ok(ExecResponse::Select(rows))
             }
             SqlQuery::Insert(insert) => {
@@ -55,7 +57,9 @@ impl Execution {
             }
             SqlQuery::Create(create) => {
                 let table = Table::new(create.columns);
-
+                if self.tables.contains_key(&create.table) {
+                    return Err(QueryExecutionError::TableAlreadyExists(create.table));
+                }
                 self.tables.insert(create.table, table);
                 Ok(ExecResponse::Create)
             }
