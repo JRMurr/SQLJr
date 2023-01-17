@@ -21,6 +21,7 @@ pub enum QueryExecutionError {
 // @CLEANUP:  This feels weird to define here.
 // Maybe make a crate for "full pipeline"
 
+/// Errors at any point in the SQL "pipeline"
 #[derive(Error, Debug, Diagnostic)]
 #[error(transparent)]
 pub enum SQLError<'a> {
@@ -31,7 +32,7 @@ pub enum SQLError<'a> {
     ParsingError(FormattedError<'a>),
 }
 
-// need a manual impl since this error #[from] is sad on lifetimes
+// need a manual impl since the error #[from] seems sad on lifetimes
 impl<'a> From<FormattedError<'a>> for SQLError<'a> {
     fn from(value: FormattedError<'a>) -> Self {
         SQLError::ParsingError(value)

@@ -16,7 +16,7 @@ use table::Table;
 #[derive(Debug, Display)]
 
 pub enum ExecResponse<'a> {
-    #[display(fmt = "{_0:?}")] // only show the values not "Select(...)"
+    #[display(fmt = "{_0:#?}")] // only show the values not "Select(...)"
     Select(Vec<Row<'a>>),
     Insert,
     Create,

@@ -8,9 +8,10 @@ use sql_jr_parser::Column;
 
 use crate::row::Row;
 
-// type RowHashMap = HashMap<String, String>;
+/// A row stored in a table
 type StoredRow = HashMap<String, String>;
 
+/// List of column info
 pub type ColumnInfo = Vec<Column>;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -18,10 +19,12 @@ pub(crate) struct Table {
     /// row id to row
     rows: BTreeMap<usize, StoredRow>,
 
+    /// Column info for all columns in the table
     columns: ColumnInfo,
 }
 
 impl Table {
+    // Create a table with the given column definitions
     pub fn new(columns: Vec<Column>) -> Self {
         Self {
             rows: BTreeMap::new(),
@@ -29,15 +32,16 @@ impl Table {
         }
     }
 
+    /// Insert values (a row) into the table
+    ///
+    /// Assumes the values are in the same order of the [`Column`]s passed to
+    /// create
     pub fn insert(&mut self, values: Vec<String>) {
-        // TODO: make sql literal type that will be converted to the rust types
-
         let id = self
             .rows
             .last_key_value()
             .map_or(0, |(max_id, _)| max_id + 1);
 
-        // TODO: make sure values is the right length and types
         let row: StoredRow = values
             .into_iter()
             .zip(self.columns.iter())
@@ -48,14 +52,27 @@ impl Table {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = Row> {
+        self.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a Table {
+    type Item = Row<'a>;
+
+    type IntoIter = TableIter<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
         let col_info = Rc::new(self.columns.clone());
 
         TableIter::new(self.rows.iter(), col_info)
     }
 }
 
-struct TableIter<'a> {
+/// Iterator of [`Row`]s from a table
+pub(crate) struct TableIter<'a> {
+    /// Underlying iterator over the btree_map
     map_iter: std::collections::btree_map::Iter<'a, usize, StoredRow>,
+    /// The columns of the [`Table`]
     columns: Rc<ColumnInfo>,
 }
 

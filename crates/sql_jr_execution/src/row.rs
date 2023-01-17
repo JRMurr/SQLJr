@@ -1,10 +1,11 @@
 use std::{collections::HashMap, rc::Rc};
 
-use derive_more::From;
+use derive_more::Display;
 
 use crate::{error::QueryExecutionError, table::ColumnInfo};
-/// A Row for a select
-#[derive(Debug, From, Clone)]
+/// A Row in a Query Response
+#[derive(Debug, Clone, Display)]
+#[display(fmt = "{:#?}", data)]
 pub struct Row<'a> {
     id: usize,
     columns: Rc<ColumnInfo>,
