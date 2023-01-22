@@ -17,7 +17,8 @@ use table::Table;
 
 pub enum ExecResponse<'a> {
     #[display(fmt = "{_0:#?}")] // only show the values not "Select(...)"
-    Select(Vec<Row<'a>>),
+    Select(Vec<Row<'a>>), /* TODO: return struct of column info + rows to better support empty
+                           * returns */
     Insert,
     Create,
 }

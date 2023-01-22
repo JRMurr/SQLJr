@@ -17,6 +17,10 @@ impl<'a> Row<'a> {
         Self { id, columns, data }
     }
 
+    pub fn columns(&self) -> &ColumnInfo {
+        self.columns.as_ref()
+    }
+
     /// Get a single value from the row
     ///
     /// # Panics

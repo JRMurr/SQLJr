@@ -8,3 +8,4 @@ miette = {workspace = true, features = ["fancy"]}
 rustyline = "10.0.0"
 sql_jr_execution = { path = "../sql_jr_execution" }
 sql_jr_parser = { path = "../sql_jr_parser" }
+tabled = "0.10.0"

@@ -1,6 +1,8 @@
+use display::display_response;
 use miette::{Context, GraphicalReportHandler, IntoDiagnostic};
 use rustyline::error::ReadlineError;
 
+mod display;
 const HISTORY_FILE: &str = "./history.txt";
 
 fn main() -> miette::Result<()> {
@@ -20,7 +22,7 @@ fn main() -> miette::Result<()> {
                 let line: &str = line.as_ref();
                 let res = exec.parse_and_run(line);
                 match res {
-                    Ok(exec_res) => println!("{exec_res}"),
+                    Ok(exec_res) => display_response(exec_res),
                     Err(e) => {
                         let mut s = String::new();
                         GraphicalReportHandler::new()
