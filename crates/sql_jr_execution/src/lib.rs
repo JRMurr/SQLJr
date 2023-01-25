@@ -5,9 +5,8 @@ use std::collections::HashMap;
 
 use derive_more::Display;
 use error::{QueryExecutionError, SQLError};
-use row::Row;
 use sql_jr_parser::ast::{parse_sql_query, SqlQuery};
-use table::Table;
+use table::{Table, TableIter};
 // TODO: Eventually might be good to have to do something like
 // `query('..').fetch` to get values back the rest of the query types would
 // return unit or some message
@@ -17,8 +16,8 @@ use table::Table;
 
 pub enum ExecResponse<'a> {
     #[display(fmt = "{_0:#?}")] // only show the values not "Select(...)"
-    Select(Vec<Row<'a>>), /* TODO: return struct of column info + rows to better support empty
-                           * returns */
+    Select(TableIter<'a>), /* TODO: return struct of column info + rows to better support empty
+                            * returns */
     Insert,
     Create,
 }
@@ -38,15 +37,13 @@ impl Execution {
     pub fn run(&mut self, query: SqlQuery) -> Result<ExecResponse, QueryExecutionError> {
         match query {
             SqlQuery::Select(select) => {
-                let _cols = select.fields;
+                let columns = select.fields;
                 let table = select.table;
                 let table = self
                     .tables
                     .get(&table)
                     .ok_or(QueryExecutionError::TableNotFound(table))?;
-                // TODO: check cols
-                let rows = table.iter().collect();
-                Ok(ExecResponse::Select(rows))
+                Ok(ExecResponse::Select(table.select(columns)?))
             }
             SqlQuery::Insert(insert) => {
                 let Some(table) = self.tables.get_mut(&insert.table) else {

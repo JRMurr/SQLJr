@@ -5,15 +5,15 @@ use derive_more::Display;
 use crate::{error::QueryExecutionError, table::ColumnInfo};
 /// A Row in a Query Response
 #[derive(Debug, Clone, Display)]
-#[display(fmt = "{:#?}", data)]
+#[display(fmt = "{data:#?}")]
 pub struct Row<'a> {
     id: usize,
     columns: Rc<ColumnInfo>,
-    data: &'a HashMap<String, String>,
+    data: HashMap<&'a String, &'a String>,
 }
 
 impl<'a> Row<'a> {
-    pub fn new(columns: Rc<ColumnInfo>, id: usize, data: &'a HashMap<String, String>) -> Self {
+    pub fn new(columns: Rc<ColumnInfo>, id: usize, data: HashMap<&'a String, &'a String>) -> Self {
         Self { id, columns, data }
     }
 
