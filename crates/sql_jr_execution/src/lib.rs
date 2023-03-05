@@ -4,8 +4,8 @@ mod table;
 use std::collections::HashMap;
 
 use derive_more::Display;
-use error::{QueryExecutionError, SQLError};
-use sql_jr_parser::ast::{parse_sql_query, SqlQuery};
+pub use error::{QueryExecutionError, SQLError};
+use sql_jr_parser::ast::{parse_multiple_queries, parse_sql_query, SqlQuery};
 use table::{Table, TableIter};
 // TODO: Eventually might be good to have to do something like
 // `query('..').fetch` to get values back the rest of the query types would
@@ -67,6 +67,26 @@ impl Execution {
         let query = parse_sql_query(query)?;
 
         let res = self.run(query)?;
+        Ok(res)
+    }
+
+    /// Run multiple queries and return the response for the last query
+    pub fn parse_multiple_and_run<'a>(
+        &'a mut self,
+        query: &'a str,
+    ) -> Result<ExecResponse, SQLError<'a>> {
+        // TODO: avoid clones?
+        let queries = parse_multiple_queries(query)?;
+
+        let (last, rest) = queries
+            .split_last()
+            .expect("at least one query should have been parsed");
+
+        for q in rest {
+            self.run(q.clone())?;
+        }
+
+        let res = self.run(last.clone())?;
         Ok(res)
     }
 }

@@ -2,8 +2,9 @@ use nom::{
     self,
     branch::alt,
     character::complete::{char, multispace0},
-    combinator::map,
+    combinator::{eof, map},
     error::context,
+    multi::many1,
     sequence::{preceded, tuple},
 };
 use serde::{Deserialize, Serialize};
@@ -61,6 +62,20 @@ impl<'a> TryFrom<&'a str> for SqlQuery {
 
 pub fn parse_sql_query(input: &str) -> Result<SqlQuery, FormattedError<'_>> {
     input.try_into()
+}
+
+impl<'a> Parse<'a> for Vec<SqlQuery> {
+    fn parse(input: crate::parse::RawSpan<'a>) -> crate::parse::ParseResult<'a, Self> {
+        // repeatedly parse queries until eof
+        // needs to parse at least 1 query
+        let (rest, (queries, _)) = tuple((many1(SqlQuery::parse), eof))(input)?;
+
+        Ok((rest, queries))
+    }
+}
+
+pub fn parse_multiple_queries(input: &str) -> Result<Vec<SqlQuery>, FormattedError<'_>> {
+    Vec::<SqlQuery>::parse_format_error(input)
 }
 
 #[cfg(test)]

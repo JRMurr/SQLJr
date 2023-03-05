@@ -65,8 +65,14 @@ fn column_definitions(input: RawSpan<'_>) -> ParseResult<'_, Vec<Column>> {
     context(
         "Column Definitions",
         map(
-            tuple((char('('), multispace0, comma_sep(Column::parse), char(')'))),
-            |(_, _, cols, _)| cols,
+            tuple((
+                char('('),
+                multispace0,
+                comma_sep(Column::parse),
+                multispace0,
+                char(')'),
+            )),
+            |(_, _, cols, _, _)| cols,
         ),
     )(input)
 }
