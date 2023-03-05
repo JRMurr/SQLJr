@@ -40,6 +40,14 @@ pub(crate) struct Table {
     columns: ColumnInfo,
 }
 
+/// Selecting columns from a table will return the columns selected and an
+/// iterator over the rows
+#[derive(Debug)]
+pub struct SelectResponse<'a> {
+    pub column_info: std::rc::Rc<ColumnInfo>,
+    pub rows: TableIter<'a>,
+}
+
 impl Table {
     // Create a table with the given column definitions
     pub fn new(columns: Vec<Column>) -> Self {

@@ -1,6 +1,6 @@
 use nom::{
     branch::alt,
-    character::complete::{char, multispace1},
+    character::complete::{char, multispace0, multispace1},
     combinator::map,
     error::context,
     sequence::{preceded, separated_pair, tuple},
@@ -65,8 +65,8 @@ fn column_definitions(input: RawSpan<'_>) -> ParseResult<'_, Vec<Column>> {
     context(
         "Column Definitions",
         map(
-            tuple((char('('), comma_sep(Column::parse), char(')'))),
-            |(_, cols, _)| cols,
+            tuple((char('('), multispace0, comma_sep(Column::parse), char(')'))),
+            |(_, _, cols, _)| cols,
         ),
     )(input)
 }

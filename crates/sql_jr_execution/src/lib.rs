@@ -16,8 +16,7 @@ use table::{Table, TableIter};
 
 pub enum ExecResponse<'a> {
     #[display(fmt = "{_0:#?}")] // only show the values not "Select(...)"
-    Select(TableIter<'a>), /* TODO: return struct of column info + rows to better support empty
-                            * returns */
+    Select(TableIter<'a>),
     Insert,
     Create,
 }
