@@ -1,6 +1,9 @@
 use display::display_response;
 use miette::{Context, GraphicalReportHandler, IntoDiagnostic};
-use rustyline::error::ReadlineError;
+use rustyline::{
+    completion::FilenameCompleter, error::ReadlineError, highlight::Highlighter, Completer,
+    CompletionType, Config, Editor, Helper, Hinter, Validator,
+};
 use sql_jr_execution::{ExecResponse, Execution, SQLError};
 
 mod display;
@@ -37,10 +40,22 @@ fn handle_line(line: String, exec: &mut Execution) {
     };
 }
 
+#[derive(Completer, Helper, Hinter, Validator)]
+struct MyHelper(#[rustyline(Completer)] FilenameCompleter); // TODO: other helper traits
+
+impl Highlighter for MyHelper {}
+
 fn main() -> miette::Result<()> {
-    let mut rl = rustyline::Editor::<()>::new()
+    let config = Config::builder()
+        .history_ignore_space(true)
+        .completion_type(CompletionType::List)
+        .build();
+    let mut rl = Editor::with_config(config)
         .into_diagnostic()
         .wrap_err("Initilizing REPL")?;
+
+    rl.set_helper(Some(MyHelper(FilenameCompleter::new())));
+
     if rl.load_history(HISTORY_FILE).is_err() {
         println!("No previous history.");
     }
@@ -50,7 +65,7 @@ fn main() -> miette::Result<()> {
         let readline = rl.readline(">> ");
         match readline {
             Ok(line) => {
-                rl.add_history_entry(line.as_str());
+                rl.add_history_entry(line.as_str()).into_diagnostic()?;
                 handle_line(line, &mut exec)
             }
             Err(ReadlineError::Interrupted) => {

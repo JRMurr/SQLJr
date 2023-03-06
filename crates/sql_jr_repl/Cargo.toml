@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-miette = {workspace = true, features = ["fancy"]}
-rustyline = "10.0.0"
+miette = { workspace = true, features = ["fancy"] }
+rustyline = { version = "11.0.0", features = ["derive"] }
 sql_jr_execution = { path = "../sql_jr_execution" }
 sql_jr_parser = { path = "../sql_jr_parser" }
 tabled = "0.10.0"
