@@ -13,7 +13,7 @@ pub fn display_response(res: ExecResponse) {
                 .collect();
             builder.set_columns(&columns);
             for row in table_iter {
-                builder.add_record(columns.iter().map(|col| row.get(col)));
+                builder.add_record(columns.iter().map(|col| row.get(col).to_string()));
             }
             println!("{}", builder.build())
         }

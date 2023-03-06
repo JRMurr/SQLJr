@@ -82,6 +82,7 @@ pub fn parse_multiple_queries(input: &str) -> Result<Vec<SqlQuery>, FormattedErr
 mod tests {
 
     use super::*;
+    use crate::value::Value;
 
     #[test]
     fn test_error() {
@@ -107,7 +108,10 @@ mod tests {
     fn test_insert() {
         let expected = InsertStatement {
             table: "foo".to_string(),
-            values: vec!["foo".to_string(), "bar".to_string()],
+            values: vec![
+                Value::String("foo".to_string()),
+                Value::String("bar".to_string()),
+            ],
         };
         assert_eq!(
             SqlQuery::parse_from_raw("insert into foo values foo,bar;")

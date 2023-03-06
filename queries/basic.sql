@@ -1,6 +1,6 @@
 CREATE TABLE foo (
-    column1 int,
-    column2 string
+    col1 int,
+    col2 string
 );
 
 INSERT INTO foo
@@ -12,8 +12,8 @@ INSERT INTO foo
         4, 5;
 
 SELECT
-    column1,
-    column2
+    col1,
+    col2
 FROM
     foo;
 

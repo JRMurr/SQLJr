@@ -6,12 +6,15 @@ use nom::{
 use nom_supreme::{tag::complete::tag_no_case, ParserExt};
 use serde::{Deserialize, Serialize};
 
-use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
+use crate::{
+    parse::{comma_sep, identifier, Parse, ParseResult, RawSpan},
+    value::Value,
+};
 
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct InsertStatement {
     pub table: String,
-    pub values: Vec<String>, // for now just Strings
+    pub values: Vec<Value>,
 } // TODO: impl display
 
 impl<'a> Parse<'a> for InsertStatement {
@@ -23,7 +26,7 @@ impl<'a> Parse<'a> for InsertStatement {
                 preceded(multispace1, tag_no_case("into")),
                 preceded(multispace1, identifier.context("Table Name")),
                 preceded(multispace1, tag_no_case("values")),
-                preceded(multispace1, comma_sep(identifier).context("Values")),
+                preceded(multispace1, comma_sep(Value::parse).context("Values")),
             )),
         )(input)?;
 

@@ -4,14 +4,14 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use sql_jr_parser::Column;
+use sql_jr_parser::{value::Value, Column};
 
 use crate::{error::QueryExecutionError, row::Row};
 
 /// A row stored in a table
 #[derive(Debug, Clone, Default, Serialize, Deserialize, derive_more::From)]
 pub struct StoredRow {
-    data: HashMap<String, String>,
+    data: HashMap<String, Value>, // TODO: store bytes instead of the value enum
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, derive_more::From)]
@@ -61,7 +61,7 @@ impl Table {
     ///
     /// Assumes the values are in the same order of the [`Column`]s passed to
     /// create
-    pub fn insert(&mut self, values: Vec<String>) {
+    pub fn insert(&mut self, values: Vec<Value>) {
         let id = self
             .rows
             .last_key_value()
