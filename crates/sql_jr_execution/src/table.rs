@@ -4,7 +4,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
-use sql_jr_parser::{value::Value, Column};
+use sql_jr_parser::{value::Value, Column, SqlTypeInfo};
 
 use crate::{error::QueryExecutionError, row::Row};
 
@@ -61,19 +61,24 @@ impl Table {
     ///
     /// Assumes the values are in the same order of the [`Column`]s passed to
     /// create
-    pub fn insert(&mut self, values: Vec<Value>) {
+    pub fn insert(&mut self, values: Vec<Value>) -> Result<(), QueryExecutionError> {
         let id = self
             .rows
             .last_key_value()
             .map_or(0, |(max_id, _)| max_id + 1);
 
-        let row: HashMap<_, _> = values
+        let row = values
             .into_iter()
             .zip(self.columns.iter())
-            .map(|(v, col)| (col.name.to_owned(), v))
-            .collect();
+            .map(|(value, col)| match (col.type_info, value) {
+                (SqlTypeInfo::String, v @ Value::String(_)) => Ok((col.name.to_owned(), v)),
+                (SqlTypeInfo::Int, v @ Value::Number(_)) => Ok((col.name.to_owned(), v)), // TODO: when we add floats make sure number is an int
+                (_,v) => Err(QueryExecutionError::InsertTypeMismatch(col.type_info, v)),
+            })
+            .collect::<Result<HashMap<_, _>,_>>()?;
 
         self.rows.insert(id, row.into());
+        Ok(())
     }
 
     pub fn select(&self, columns: Vec<String>) -> Result<TableIter, QueryExecutionError> {

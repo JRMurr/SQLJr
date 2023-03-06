@@ -1,3 +1,4 @@
+use derive_more::Display;
 use nom::{
     branch::alt,
     character::complete::{char, multispace0, multispace1},
@@ -13,7 +14,7 @@ use crate::parse::{comma_sep, identifier, Parse, ParseResult, RawSpan};
 // TODO: feels like SqlTypeInfo + column might wanna live elsewhere. Its parse
 // thing but also needed for exec/storage? Maybe make a types crate?
 
-#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize, Display, Copy)]
 pub enum SqlTypeInfo {
     String, // maybe add size req?
     Int,

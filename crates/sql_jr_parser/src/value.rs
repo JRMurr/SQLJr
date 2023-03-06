@@ -25,11 +25,12 @@ pub enum Value {
 fn parse_string_value(input: RawSpan<'_>) -> ParseResult<'_, Value> {
     // TODO: look into https://github.com/rust-bakery/nom/blob/main/examples/string.rs
     // for escaped strings
-    let (remaining, (_, str_value)) = context(
+    let (remaining, (_, str_value, _)) = context(
         "String Literal",
         tuple((
             tag("'"),
             take_until("'").map(|s: RawSpan| Value::String(s.fragment().to_string())),
+            tag("'"), // take_until does not consume the ending quote
         )),
     )(input)?;
 
@@ -71,8 +72,13 @@ mod tests {
     #[test]
     fn test_string() {
         let expected = Value::String("123abc new".to_string());
+        let expected_remaining = "fart '123'";
 
-        assert_eq!(Value::parse_from_raw("'123abc new'").unwrap().1, expected)
+        let (remaining, value) = Value::parse_from_raw("'123abc new' fart '123'").unwrap();
+
+        assert_eq!(value, expected);
+
+        assert_eq!(remaining.fragment().to_string(), expected_remaining)
     }
 
     #[test]

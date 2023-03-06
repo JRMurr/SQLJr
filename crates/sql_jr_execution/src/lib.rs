@@ -49,7 +49,7 @@ impl Execution {
                     return Err(QueryExecutionError::TableNotFound(insert.table))
                 };
 
-                table.insert(insert.values);
+                table.insert(insert.values)?;
                 Ok(ExecResponse::Insert)
             }
             SqlQuery::Create(create) => {

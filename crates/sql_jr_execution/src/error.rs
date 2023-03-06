@@ -1,5 +1,5 @@
 use miette::Diagnostic;
-use sql_jr_parser::error::FormattedError;
+use sql_jr_parser::{error::FormattedError, value::Value, SqlTypeInfo};
 use thiserror::Error;
 
 // @Improvement: Could have the source code + spans for exec errors?
@@ -16,6 +16,9 @@ pub enum QueryExecutionError {
 
     #[error("Column {0} does not exist")]
     ColumnDoesNotExist(String),
+
+    #[error("Value {1} can not be inserted into a {0} column")]
+    InsertTypeMismatch(SqlTypeInfo, Value),
 }
 
 // @CLEANUP:  This feels weird to define here.

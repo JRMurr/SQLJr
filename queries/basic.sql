@@ -5,11 +5,11 @@ CREATE TABLE foo (
 
 INSERT INTO foo
     VALUES
-        1, 2;
+        1, 'aString';
 
 INSERT INTO foo
     VALUES
-        4, 5;
+        4, 'aDiffString with spaces';
 
 SELECT
     col1,
