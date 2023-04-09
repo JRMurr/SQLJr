@@ -682,6 +682,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f67ad224767faa3c7d8b6d91985b78e70a1324408abcb1cfcc2be4c06bc06043"
 
 [[package]]
+name = "sql_jr_b_tree"
+version = "0.1.0"
+dependencies = [
+ "miette",
+ "thiserror",
+]
+
+[[package]]
 name = "sql_jr_execution"
 version = "0.1.0"
 dependencies = [

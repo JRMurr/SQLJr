@@ -13,7 +13,6 @@ use table::{Table, TableIter};
 // see https://github.com/launchbadge/sqlx/tree/main#querying
 
 #[derive(Debug, Display)]
-
 pub enum ExecResponse<'a> {
     #[display(fmt = "{_0:#?}")] // only show the values not "Select(...)"
     Select(TableIter<'a>),
