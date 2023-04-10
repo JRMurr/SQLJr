@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 miette = { workspace = true }
+slab = "0.4.8"
 thiserror = { workspace = true }
