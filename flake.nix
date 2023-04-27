@@ -15,7 +15,7 @@
   outputs = { self, nixpkgs, flake-utils, rust-overlay, gitignore, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) ];
+        overlays = [ (import rust-overlay) (import ./nix/version-overlay.nix) ];
         pkgs = import nixpkgs { inherit system overlays; };
         rustAttrs = import ./nix/rust.nix { inherit pkgs gitignore; };
       in {
@@ -23,6 +23,8 @@
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               rustAttrs.rust-shell
+
+              napi-rs-cli
 
               # common
               watchexec
