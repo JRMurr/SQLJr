@@ -17,7 +17,7 @@
       let
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
-        rustAttrs = import ./rust.nix { inherit pkgs gitignore; };
+        rustAttrs = import ./nix/rust.nix { inherit pkgs gitignore; };
       in {
         devShells = {
           default = pkgs.mkShell {

@@ -2,7 +2,7 @@
 
 let
   rustVersion = (pkgs.rust-bin.fromRustupToolchainFile
-    ./rust-toolchain.toml); # rust-bin.stable.latest.default
+    .././rust-toolchain.toml); # rust-bin.stable.latest.default
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustVersion;
     rustc = rustVersion;
@@ -13,7 +13,7 @@ let
     pname = name;
     version = version;
     src = gitignore.lib.gitignoreSource ./.;
-    cargoLock.lockFile = ./Cargo.lock;
+    cargoLock.lockFile = .././Cargo.lock;
     nativeBuildInputs = [ ];
   };
 in {
