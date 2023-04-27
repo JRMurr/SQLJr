@@ -1,0 +1,3 @@
+# `@sql-jr/sql-jr-client-linux-x64-gnu`
+
+This is the **x86_64-unknown-linux-gnu** binary for `@sql-jr/sql-jr-client`

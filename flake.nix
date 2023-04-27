@@ -25,6 +25,7 @@
               rustAttrs.rust-shell
 
               napi-rs-cli
+              nodejs-18_x
 
               # common
               watchexec

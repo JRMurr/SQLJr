@@ -1,0 +1,18 @@
+{
+  "name": "@sql-jr/sql-jr-client-darwin-arm64",
+  "version": "0.0.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "main": "sql-jr-client.darwin-arm64.node",
+  "files": [
+    "sql-jr-client.darwin-arm64.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  }
+}
