@@ -15,7 +15,8 @@
   outputs = { self, nixpkgs, flake-utils, rust-overlay, gitignore, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) (import ./nix/version-overlay.nix) ];
+        version-overlay = import ./nix/version-overlay.nix;
+        overlays = [ (import rust-overlay) version-overlay ];
         pkgs = import nixpkgs { inherit system overlays; };
         rustAttrs = import ./nix/rust.nix { inherit pkgs gitignore; };
       in {
