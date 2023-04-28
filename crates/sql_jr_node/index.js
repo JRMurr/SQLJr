@@ -252,6 +252,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { test } = nativeBinding
+const { Execution, test } = nativeBinding
 
+module.exports.Execution = Execution
 module.exports.test = test

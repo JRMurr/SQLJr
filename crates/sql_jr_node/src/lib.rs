@@ -1,8 +1,64 @@
-#![deny(clippy::all)]
-use sql_jr_execution::ExecResponse;
+use std::collections::HashMap;
 
-#[macro_use]
-extern crate napi_derive;
+use napi_derive::napi;
+use sql_jr_execution::{ExecResponse, Execution};
+
+#[napi(js_name = "Execution")]
+pub struct NodeExec {
+    execution: Execution,
+}
+
+// to appease clippy
+impl Default for NodeExec {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A List of rows returned by the query.
+/// Each row is a map of col => data as string
+type QueryRes = Vec<HashMap<String, String>>;
+
+#[napi]
+impl NodeExec {
+    #[napi(constructor)]
+    pub fn new() -> Self {
+        Self {
+            execution: Execution::new(),
+        }
+    }
+
+    #[napi]
+    pub fn query(&mut self, query: String) -> napi::Result<QueryRes> {
+        use napi::{Error, Status};
+        let res = self
+            .execution
+            .parse_and_run(&query)
+            // Probably a good idea to impl From<SqlError<_> for napi::Error in sql_jr_execution
+            // gated behind a napi feature flag
+            .map_err(|e| Error::new(Status::GenericFailure, format!("{}", e)))?;
+
+        Ok(match res {
+            ExecResponse::Select(table_iter) => {
+                let columns: Vec<String> = table_iter
+                    .columns
+                    .iter()
+                    .map(|col| col.name.to_string()) // Involves a clone, maybe we can make col name a Cow?
+                    .collect();
+
+                table_iter
+                    .map(|row| {
+                        columns
+                            .iter()
+                            .map(move |col| (col.clone(), row.get(col).to_string()))
+                            .collect()
+                    })
+                    .collect()
+            }
+            _ => Vec::new(),
+        })
+    }
+}
 
 #[napi]
 pub fn test() -> Vec<Vec<String>> {
