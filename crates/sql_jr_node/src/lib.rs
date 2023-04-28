@@ -28,7 +28,7 @@ impl NodeExec {
         }
     }
 
-    #[napi]
+    #[napi(ts_return_type = "Array<Record<string,string>>")]
     pub fn query(&mut self, query: String) -> napi::Result<QueryRes> {
         use napi::{Error, Status};
         let res = self
@@ -43,7 +43,7 @@ impl NodeExec {
                 let columns: Vec<String> = table_iter
                     .columns
                     .iter()
-                    .map(|col| col.name.to_string()) // Involves a clone, maybe we can make col name a Cow?
+                    .map(|col| col.name.to_string())
                     .collect();
 
                 table_iter
@@ -108,7 +108,7 @@ pub fn test() -> Vec<Vec<String>> {
             let columns: Vec<String> = table_iter
                 .columns
                 .iter()
-                .map(|col| col.name.to_string()) // Involves a clone, maybe we can make col name a Cow?
+                .map(|col| col.name.to_string())
                 .collect();
 
             let rows: Vec<Vec<_>> = table_iter

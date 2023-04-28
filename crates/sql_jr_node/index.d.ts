@@ -7,5 +7,5 @@ export function test(): Array<Array<string>>
 export type NodeExec = Execution
 export class Execution {
   constructor()
-  query(query: string): QueryRes
+  query(query: string): Array<Record<string,string>>
 }
