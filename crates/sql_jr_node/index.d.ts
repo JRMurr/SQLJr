@@ -8,4 +8,11 @@ export type NodeExec = Execution
 export class Execution {
   constructor()
   query(query: string): Array<Record<string,string>>
+  /**
+   * # Safety
+   *
+   * The execution struct should not be handled in multiple async functions
+   * at a time.
+   */
+  queryAsync(queryPromise: Promise<string>): Promise<Array<Record<string,string>>>
 }

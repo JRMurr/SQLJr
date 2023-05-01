@@ -1,4 +1,5 @@
 {
   "cSpell.words": ["readline", "rustyline"],
-  "window.zoomLevel": -1
+  "window.zoomLevel": -1,
+  "rust-analyzer.procMacro.ignored": { "napi-derive": ["napi"] }
 }

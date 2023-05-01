@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use napi::bindgen_prelude::Promise;
 use napi_derive::napi;
 use sql_jr_execution::{ExecResponse, Execution};
 
@@ -57,6 +58,20 @@ impl NodeExec {
             }
             _ => Vec::new(),
         })
+    }
+
+    /// # Safety
+    ///
+    /// The execution struct should not be handled in multiple async functions
+    /// at a time.
+    #[napi(ts_return_type = "Promise<Array<Record<string,string>>>")]
+    pub async unsafe fn query_async(
+        &mut self,
+        query_promise: Promise<String>,
+    ) -> napi::Result<QueryRes> {
+        let query = query_promise.await?;
+
+        self.query(query)
     }
 }
 

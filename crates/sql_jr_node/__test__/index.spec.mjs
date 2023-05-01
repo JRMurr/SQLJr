@@ -60,3 +60,22 @@ test('exec struct', (t) => {
         ]
     );
 });
+
+
+test('async function', async (t) => {
+    const exec = new Execution();
+
+    const get_query = async () => {
+        return `
+            CREATE TABLE foo (
+                col1 int,
+                col2 string
+            );
+        `;
+    }
+
+    t.deepEqual(
+        await exec.queryAsync(get_query()),
+        []
+    );
+})
