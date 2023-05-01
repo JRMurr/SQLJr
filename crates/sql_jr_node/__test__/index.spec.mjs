@@ -1,9 +1,9 @@
 import test from 'ava';
 
-import { test as testFn, Execution } from '../index.js';
+import { basicQuery, Execution } from '../index.js';
 
 test('basic test', (t) => {
-    t.deepEqual(testFn(), [
+    t.deepEqual(basicQuery(), [
         ['1', 'aString'],
         ['4', 'aDiffString with spaces'],
     ]);
@@ -61,6 +61,11 @@ test('exec struct', (t) => {
     );
 });
 
+test('parse error', (t) => {
+    const exec = new Execution();
+
+    t.throws(() => exec.query(`sad`), { code: 'GenericFailure', message: 'Parse Error' });
+});
 
 test('async function', async (t) => {
     const exec = new Execution();
@@ -72,10 +77,7 @@ test('async function', async (t) => {
                 col2 string
             );
         `;
-    }
+    };
 
-    t.deepEqual(
-        await exec.queryAsync(get_query()),
-        []
-    );
-})
+    t.deepEqual(await exec.queryAsync(get_query()), []);
+});

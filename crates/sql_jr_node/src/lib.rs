@@ -76,7 +76,7 @@ impl NodeExec {
 }
 
 #[napi]
-pub fn test() -> Vec<Vec<String>> {
+pub fn basic_query() -> Vec<Vec<String>> {
     let mut exec = sql_jr_execution::Execution::new();
     exec.parse_and_run(
         "
