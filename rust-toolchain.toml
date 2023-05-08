@@ -1,4 +1,4 @@
 [toolchain]
 # https://rust-lang.github.io/rustup-components-history/
-channel = "nightly-2023-03-05"
+channel = "nightly-2023-05-08"
 components = ["cargo", "clippy", "rustfmt"]
